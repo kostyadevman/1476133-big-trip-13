@@ -1,7 +1,7 @@
 # Проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Костя](https://up.htmlacademy.ru/ecmascript/13/user/1476133).
-* Наставник: `Неизвестно`.
+* Наставник: [Артём Матковский](https://htmlacademy.ru/profile/id1151767).
 
 ---
 
