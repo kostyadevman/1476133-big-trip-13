@@ -5,6 +5,7 @@
   "description": "Проект «Большое путешествие» от HTML Academy",
   "scripts": {
     "eslint": "eslint src/**/*.js",
+    "lint-fix": "eslint --fix src/**/*.js",
     "test": "npm run eslint",
     "build": "webpack --mode development",
     "start": "webpack-dev-server --open"
