@@ -29,7 +29,7 @@ export const getFormCreationDate = (date) => {
 
 export const getTripInfoDate = (date) => {
   return dayjs(date).format(`DD MMM`);
-}
+};
 
 export const getDuration = (start, end) => {
   let duration = ``;

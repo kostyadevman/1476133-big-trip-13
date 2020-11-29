@@ -67,7 +67,6 @@ const formDestinationTemplate = (destination, photos, description) => {
 export const formCreateTemplate = (point = {}) => {
   const {
     type = `Taxi`,
-    date = null,
     timeStart = null,
     timeEnd = null,
     price = null,

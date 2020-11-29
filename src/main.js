@@ -3,7 +3,7 @@ import {tripCostTemplate} from "./view/trip-cost";
 import {siteMenuTemplate} from "./view/site-menu";
 import {filterTemplate} from "./view/filter";
 import {sortTemplate} from "./view/sort";
-import {formCreateTemplate} from "./view/form-create";
+// import {formCreateTemplate} from "./view/form-create";
 import {formEditTemplate} from "./view/form-edit";
 import {tripPointListTemplate} from "./view/trip-point-list";
 import {tripPointTemplate} from "./view/trip-point";
@@ -38,7 +38,7 @@ if (points.length > 0) {
 
   for (let i = 1; i < TRIP_POINT_COUNT; i++) {
     render(tripPointListElement, tripPointTemplate(pointsSorted[i]), `beforeend`);
-  };
-};
+  }
+}
 
 
