@@ -2,24 +2,15 @@ import {getRandomInteger} from "../utils";
 import dayjs from "dayjs";
 import {nanoid} from 'nanoid';
 
-const PHOTO_COUNT_MAX = 4;
+import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS} from "../const";
+
+const PHOTO_COUNT_MAX = 20;
 const OFFER_COUNT = 20;
 const POINT_OFFER_COUNT_MAX = 5;
 const PRICE_MAX = 120;
 
 const generateType = () => {
-  const tripPointTypes = [
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`,
-    `Check-in`,
-    `Sightseeing`,
-    `Restaurant`
-  ];
+  const tripPointTypes = TRIP_POINT_TYPES;
 
   const randomIndex = getRandomInteger(0, tripPointTypes.length - 1);
 
@@ -27,13 +18,7 @@ const generateType = () => {
 };
 
 const generateDestination = () => {
-  const destinations = [
-    `Amsterdam`,
-    `Chamonix`,
-    `Geneva`,
-    `London`,
-    `Paris`,
-  ];
+  const destinations = TRIP_POINT_DESTINATIONS;
 
   const randomIndex = getRandomInteger(0, destinations.length - 1);
 
@@ -100,13 +85,14 @@ const getOffers = (type) => {
 
 const generatePhotos = () => {
   const photos = [];
-  const photo = `http://picsum.photos/248/152?r=${Math.random()}`;
-  photos.push(photo);
+  const getPhoto = () => {
+    return `http://picsum.photos/248/152?r=${Math.random()}`;
+  };
 
   for (let i = 1; i < getRandomInteger(0, PHOTO_COUNT_MAX); i++) {
-    photos.push(photo);
+    photos.push(getPhoto());
   }
-  return photo;
+  return photos;
 };
 
 const generateDate = () => {

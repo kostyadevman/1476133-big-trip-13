@@ -23,6 +23,14 @@ export const getDateToAttribute = (date) => {
   return dayjs(date).format(`YYYY-MM-DDTHH:mm`);
 };
 
+export const getFormCreationDate = (date) => {
+  return dayjs(date).format(`DD/MM/YYYY HH:mm`);
+};
+
+export const getTripInfoDate = (date) => {
+  return dayjs(date).format(`DD MMM`);
+}
+
 export const getDuration = (start, end) => {
   let duration = ``;
   const dayDuration = dayjs(end).diff(dayjs(start), `day`);
