@@ -1,5 +1,6 @@
-import {getIcon, getFormCreationDate} from "../utils";
+import {getIcon, getFormCreationDate, createElement} from "../utils";
 import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS} from "../const";
+import {createTripPointTemplate} from "./trip-point";
 
 const formTypeListTemplate = () => {
   return `<div class="event__type-list">
@@ -64,7 +65,7 @@ const formDestinationTemplate = (destination, photos, description) => {
       </section>` : ``}`;
 };
 
-export const formEditTemplate = (point = {}) => {
+const createFormEditTemplate = (point = {}) => {
   const {
     type = `Taxi`,
     timeStart = null,
@@ -136,3 +137,26 @@ export const formEditTemplate = (point = {}) => {
     </section>
   </form>`;
 };
+
+export default class FormEdit {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFormEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

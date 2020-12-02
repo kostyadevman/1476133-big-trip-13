@@ -41,3 +41,38 @@ export const getDuration = (start, end) => {
   duration += minuteDuration ? minuteDuration.toString().padStart(2, `0`) + `M ` : ``;
   return duration;
 };
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+  BEFOREBEGIN: `beforebegin`,
+  AFTEREND: `afterend`
+};
+
+export const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+    case RenderPosition.BEFOREBEGIN:
+      container.insertAdjacentElement(`beforebegin`, element);
+      break;
+    case RenderPosition.AFTEREND:
+      container.insertAdjacentElement(`afterend`, element);
+  }
+};
+
+export const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};

@@ -1,13 +1,15 @@
-import {tripInfoTemplate} from "./view/trip-info.js";
-import {tripCostTemplate} from "./view/trip-cost";
-import {siteMenuTemplate} from "./view/site-menu";
-import {filterTemplate} from "./view/filter";
-import {sortTemplate} from "./view/sort";
-// import {formCreateTemplate} from "./view/form-create";
-import {formEditTemplate} from "./view/form-edit";
-import {tripPointListTemplate} from "./view/trip-point-list";
-import {tripPointTemplate} from "./view/trip-point";
+import TripInfo from "./view/trip-info.js";
+import TripCost from "./view/trip-cost";
+import SiteMenuView from "./view/site-menu";
+import FilterView from "./view/filter";
+import SortView from "./view/sort";
+// import FormCreate from "./view/form-create";
+import FormEdit from "./view/form-edit";
+import TripPointList from "./view/trip-point-list";
+import TripPoint from "./view/trip-point";
 import {generateTripPoint} from "./mock/trip-point";
+import {renderTemplate, renderElement, RenderPosition} from "./utils";
+
 const TRIP_POINT_COUNT = 20;
 
 const points = new Array(TRIP_POINT_COUNT).fill().map(generateTripPoint);
@@ -15,29 +17,25 @@ const pointsSorted = points.sort((a, b) => {
   return a.date - b.date;
 });
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const siteHeaderElement = document.querySelector(`.trip-main`);
 const siteMainElement = document.querySelector(`.page-main`);
 
+renderElement(siteHeaderElement.querySelector(`.trip-controls h2:first-child`), new SiteMenuView().getElement(), RenderPosition.AFTEREND);
+renderElement(siteHeaderElement.querySelector(`.trip-controls h2:last-child`), new FilterView().getElement(), RenderPosition.AFTEREND);
 
-render(siteHeaderElement.querySelector(`.trip-controls h2:first-child`), siteMenuTemplate(), `afterend`);
-render(siteHeaderElement.querySelector(`.trip-controls h2:last-child`), filterTemplate(), `afterend`);
-
-render(siteMainElement.querySelector(`.trip-events`), sortTemplate(), `beforeend`);
-render(siteMainElement.querySelector(`.trip-events`), tripPointListTemplate(points), `beforeend`);
+renderElement(siteMainElement.querySelector(`.trip-events`), new SortView().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteMainElement.querySelector(`.trip-events`), new TripPointList(points).getElement(), RenderPosition.BEFOREEND);
 
 const tripPointListElement = siteMainElement.querySelector(`.trip-events__list`);
 
 if (points.length > 0) {
-  render(siteHeaderElement, tripInfoTemplate(pointsSorted), `afterbegin`);
-  render(siteHeaderElement.querySelector(`.trip-info`), tripCostTemplate(points), `beforeend`);
-  render(tripPointListElement, formEditTemplate(pointsSorted[0]), `beforeend`);
+  renderElement(siteHeaderElement, new TripInfo(pointsSorted).getElement(), RenderPosition.AFTERBEGIN);
+  renderElement(siteHeaderElement.querySelector(`.trip-info`), new TripCost(points).getElement(), RenderPosition.BEFOREEND);
+  renderElement(tripPointListElement, new FormEdit(pointsSorted[0]), RenderPosition.BEFOREEND);
 
   for (let i = 1; i < TRIP_POINT_COUNT; i++) {
-    render(tripPointListElement, tripPointTemplate(pointsSorted[i]), `beforeend`);
+    renderElement(tripPointListElement, new TripPoint(pointsSorted[i]).getElement(), RenderPosition.BEFOREEND);
   }
 }
 
