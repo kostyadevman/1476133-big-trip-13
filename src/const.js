@@ -37,3 +37,14 @@ export const MENU_ITEMS = [
   `Table`,
   `Stats`
 ];
+
+export const BLANK_POINT = {
+  type: `Taxi`,
+  timeStart: null,
+  timeEnd: null,
+  price: null,
+  description: ``,
+  destination: ``,
+  offers: [],
+  photos: []
+}

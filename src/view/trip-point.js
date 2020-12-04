@@ -3,7 +3,8 @@ import {
   getIcon,
   getDateToAttribute,
   getDuration,
-  humanizePointEventDate, createElement
+  humanizePointEventDate,
+  createElement
 } from "../utils";
 
 
