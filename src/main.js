@@ -34,6 +34,7 @@ const renderPoint = (pointListElement, point) => {
   const replaceFormToPoint = () => {
     pointListElement.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
   };
+
   const onEscKeyDown = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
@@ -42,16 +43,24 @@ const renderPoint = (pointListElement, point) => {
     }
   };
 
+  const closeButtonClickHandler = () => {
+    replaceFormToPoint();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  };
+
   pointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     replacePointToForm();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
+  const pointFormEdit = pointEditComponent.getElement().querySelector(`form`);
 
-  pointEditComponent.getElement().querySelector(`form`).addEventListener(`submit`, (evt) => {
+  pointFormEdit.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceFormToPoint();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
+
+  pointFormEdit.querySelector(`.event__rollup-btn`).addEventListener(`click`, closeButtonClickHandler);
 
   render(pointListElement, pointComponent.getElement(), RenderPosition.BEFOREEND);
 };
