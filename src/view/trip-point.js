@@ -3,11 +3,12 @@ import {
   getIcon,
   getDateToAttribute,
   getDuration,
-  humanizePointEventDate
+  humanizePointEventDate,
+  createElement
 } from "../utils";
 
 
-export const tripPointTemplate = (point) => {
+export const createTripPointTemplate = (point) => {
   const {date, type, price, destination, offers, isFavorite, timeStart, timeEnd} = point;
 
   const icon = getIcon(type);
@@ -61,3 +62,26 @@ export const tripPointTemplate = (point) => {
     </div>
   </li>`;
 };
+
+export default class TripPoint {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

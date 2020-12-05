@@ -1,4 +1,4 @@
-import {getTripInfoDate} from "../utils";
+import {createElement, getTripInfoDate} from "../utils";
 
 const SHOT_FORM_POINT_COUNT = 3;
 const getTripRoute = (points) => {
@@ -15,7 +15,7 @@ const getTripRouteDate = (points) => {
   return `${getTripInfoDate(points[0].date)} - ${getTripInfoDate(points[points.length - 1].date)}`;
 };
 
-export const tripInfoTemplate = (tripPoints) => {
+const createTripInfoTemplate = (tripPoints) => {
   const tripRoute = getTripRoute(tripPoints);
   const tripRouteDate = getTripRouteDate(tripPoints);
   return `<section class="trip-main__trip-info  trip-info">
@@ -26,3 +26,26 @@ export const tripInfoTemplate = (tripPoints) => {
     </div>
   </section>`;
 };
+
+export default class TripInfo {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
