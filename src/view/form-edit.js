@@ -1,5 +1,6 @@
-import {getIcon, getFormCreationDate, createElement} from "../utils";
 import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS, BLANK_POINT} from "../const";
+import AbstracView from "./abstract.js";
+import {getFormCreationDate, getIcon} from "../utils/point";
 
 const formTypeListTemplate = () => {
   return `<div class="event__type-list">
@@ -130,25 +131,36 @@ const createFormEditTemplate = (point) => {
   </li>`;
 };
 
-export default class FormEdit {
+export default class FormEdit extends AbstracView {
   constructor(point = BLANK_POINT) {
+    super();
     this._point = point;
-    this._element = null;
+
+    this._closeClickHandler = this._closeClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createFormEditTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _closeClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
   }
 
-  removeElement() {
-    this._element = null;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 }

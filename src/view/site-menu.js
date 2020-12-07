@@ -1,5 +1,5 @@
 import {MENU_ITEMS} from "../const";
-import {createElement} from "../utils";
+import AbstractView from "./abstract.js";
 
 const menuItemsTemplate = () => {
   return `${MENU_ITEMS.map((item) => `<a class="trip-tabs__btn  trip-tabs__btn--active" href="#">${item}</a>`).join(``)}`;
@@ -12,24 +12,8 @@ const createSiteMenuTemplate = () => {
   </nav>`;
 };
 
-export default class SiteMenu {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SiteMenu extends AbstractView {
   getTemplate() {
     return createSiteMenuTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

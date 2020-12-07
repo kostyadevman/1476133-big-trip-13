@@ -1,12 +1,5 @@
-import {
-  humanizePointEventTime,
-  getIcon,
-  getDateToAttribute,
-  getDuration,
-  humanizePointEventDate,
-  createElement
-} from "../utils";
-
+import AbstracView from "./abstract.js";
+import {getDateToAttribute, getDuration, getIcon, humanizePointEventDate, humanizePointEventTime} from "../utils/point";
 
 export const createTripPointTemplate = (point) => {
   const {date, type, price, destination, offers, isFavorite, timeStart, timeEnd} = point;
@@ -63,25 +56,25 @@ export const createTripPointTemplate = (point) => {
   </li>`;
 };
 
-export default class TripPoint {
+export default class TripPoint extends AbstracView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return createTripPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
   }
 }
