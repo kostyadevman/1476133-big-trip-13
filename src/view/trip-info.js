@@ -1,4 +1,5 @@
-import {createElement, getTripInfoDate} from "../utils";
+import AbstracView from "./abstract.js";
+import {getTripInfoDate} from "../utils/point";
 
 const SHOT_FORM_POINT_COUNT = 3;
 const getTripRoute = (points) => {
@@ -27,25 +28,13 @@ const createTripInfoTemplate = (tripPoints) => {
   </section>`;
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstracView {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

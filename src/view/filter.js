@@ -1,5 +1,5 @@
+import AbstracView from "./abstract.js";
 import {FILTERS} from "../const";
-import {createElement} from "../utils";
 
 export const filterItemsTemplate = () => {
   return `${FILTERS.map((filter) => `<div class="trip-filters__filter">
@@ -16,24 +16,8 @@ const createFilterTemplate = () => {
   </form>`;
 };
 
-export default class Filter {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Filter extends AbstracView {
   getTemplate() {
     return createFilterTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
