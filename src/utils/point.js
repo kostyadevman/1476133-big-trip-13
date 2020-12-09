@@ -16,7 +16,7 @@ export const getDateToAttribute = (date) => {
   return dayjs(date).format(`YYYY-MM-DDTHH:mm`);
 };
 
-export const getFormCreationDate = (date) => {
+export const getEventCreationDate = (date) => {
   return dayjs(date).format(`DD/MM/YYYY HH:mm`);
 };
 

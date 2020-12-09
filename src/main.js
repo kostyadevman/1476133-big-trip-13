@@ -3,8 +3,8 @@ import TripCostView from "./view/trip-cost.js";
 import SiteMenuView from "./view/site-menu.js";
 import FilterView from "./view/filter.js";
 import SortView from "./view/sort.js";
-// import FormCreateView from "./view/form-create.js";
-import FormEditView from "./view/form-edit.js";
+// import EventCreateView from "./view/event-create.js";
+import EventEditView from "./view/event-edit.js";
 import TripPointListView from "./view/trip-point-list.js";
 import TripPointView from "./view/trip-point.js";
 import NoTripPoint from "./view/on-trip-point.js";
@@ -24,7 +24,7 @@ const siteMainElement = document.querySelector(`.page-main`);
 
 const renderPoint = (pointListElement, point) => {
   const pointComponent = new TripPointView(point);
-  const pointEditComponent = new FormEditView(point);
+  const pointEditComponent = new EventEditView(point);
 
 
   const replacePointToForm = () => {
@@ -74,9 +74,10 @@ if (points.length > 0) {
   render(siteHeaderElement, new TripInfoView(pointsSorted), RenderPosition.AFTERBEGIN);
   render(siteHeaderElement.querySelector(`.trip-info`), new TripCostView(points), RenderPosition.BEFOREEND);
 
-  for (let i = 1; i < TRIP_POINT_COUNT; i++) {
-    renderPoint(tripPointListComponent.getElement(), pointsSorted[i]);
-  }
+  pointsSorted.forEach((point) => {
+    renderPoint(tripPointListComponent.getElement(), point);
+  });
+
 } else {
   render(tripPointListComponent.getElement(), new NoTripPoint(), RenderPosition.BEFOREEND);
 }
