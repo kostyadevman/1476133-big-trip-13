@@ -9,6 +9,8 @@ const OFFER_COUNT = 20;
 const POINT_OFFER_COUNT_MAX = 5;
 const PRICE_MAX = 120;
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const generateType = () => {
   const tripPointTypes = TRIP_POINT_TYPES;
 
@@ -116,6 +118,7 @@ export const generateTripPoint = () => {
   const timeStart = addDuration(date);
   const timeEnd = addDuration(timeStart);
   return {
+    id: generateId(),
     type,
     date,
     timeStart,
