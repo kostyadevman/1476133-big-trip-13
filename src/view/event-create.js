@@ -1,8 +1,8 @@
 import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS, BLANK_POINT} from "../const";
 import AbstracView from "./abstract.js";
-import {getFormCreationDate, getIcon} from "../utils/point";
+import {getEventCreationDate, getIcon} from "../utils/point";
 
-const formTypeListTemplate = () => {
+const eventTypeListTemplate = () => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
@@ -24,13 +24,13 @@ const formTypeListTemplate = () => {
   </div>`;
 };
 
-const formOptionListTemplate = () => {
+const eventOptionListTemplate = () => {
   return `${TRIP_POINT_DESTINATIONS.map((destination) =>
     `<option value="${destination}"></option>`
   ).join(``)}`;
 };
 
-const formOfferListTemplate = (offers) => {
+const eventOfferListTemplate = (offers) => {
   return `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
@@ -46,7 +46,7 @@ const formOfferListTemplate = (offers) => {
   </section>` : ``}`;
 };
 
-const formPhotoListTemplate = (photos) => {
+const eventPhotoListTemplate = (photos) => {
   return `${photos !== [] ? `<div class="event__photos-container">
         <div class="event__photos-tape">
           ${photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
@@ -54,8 +54,8 @@ const formPhotoListTemplate = (photos) => {
       </div>` : ``}`;
 };
 
-const formDestinationTemplate = (destination, photos, description) => {
-  const photoList = formPhotoListTemplate(photos);
+const eventDestinationTemplate = (destination, photos, description) => {
+  const photoList = eventPhotoListTemplate(photos);
   return `${destination !== `` ? `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${description}</p>
@@ -65,15 +65,15 @@ const formDestinationTemplate = (destination, photos, description) => {
       </section>` : ``}`;
 };
 
-export const createFormCreateTemplate = (point) => {
+export const createEventCreateTemplate = (point) => {
   const {destination, photos, description, timeStart, timeEnd, offers, type, price} = point;
 
-  const formDestination = formDestinationTemplate(destination, photos, description);
-  const eventStartDate = timeStart !== null ? getFormCreationDate(timeStart) : ``;
-  const eventEndDate = timeEnd !== null ? getFormCreationDate(timeEnd) : ``;
-  const typeList = formTypeListTemplate();
-  const options = formOptionListTemplate();
-  const offerList = formOfferListTemplate(offers);
+  const eventDestination = eventDestinationTemplate(destination, photos, description);
+  const eventStartDate = timeStart !== null ? getEventCreationDate(timeStart) : ``;
+  const eventEndDate = timeEnd !== null ? getEventCreationDate(timeEnd) : ``;
+  const typeList = eventTypeListTemplate();
+  const options = eventOptionListTemplate();
+  const offerList = eventOfferListTemplate(offers);
   const icon = getIcon(type);
 
   return `<form class="event event--edit" action="#" method="post">
@@ -121,12 +121,12 @@ export const createFormCreateTemplate = (point) => {
     <section class="event__details">
       ${offerList}
 
-      ${formDestination}
+      ${eventDestination}
     </section>
   </form>`;
 };
 
-export default class FormCreate extends AbstracView {
+export default class EventCreate extends AbstracView {
   constructor(point = BLANK_POINT) {
     super();
     this._point = point;
@@ -136,7 +136,7 @@ export default class FormCreate extends AbstracView {
   }
 
   getTemplate() {
-    return createFormCreateTemplate(this._point);
+    return createEventCreateTemplate(this._point);
   }
 
   _closeClickHandler(evt) {
