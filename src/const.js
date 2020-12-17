@@ -25,13 +25,13 @@ export const FILTERS = [
   `Past`
 ];
 
-export const SORTS = [
-  `Day`,
-  `Event`,
-  `Time`,
-  `Price`,
-  `Offers`
-];
+export const SortType = {
+  DAY: `Day`,
+  EVENT: `Event`,
+  TIME: `Time`,
+  PRICE: `Price`,
+  OFFERS: `Offers`
+};
 
 export const MENU_ITEMS = [
   `Table`,
