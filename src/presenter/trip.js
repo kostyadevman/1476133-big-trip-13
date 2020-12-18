@@ -7,6 +7,8 @@ import TripPointListView from "../view/trip-point-list.js";
 import NoTripPoint from "../view/on-trip-point.js";
 import {render, RenderPosition} from "../utils/render.js";
 import {updateItem} from "../utils/common.js";
+import {SortType} from "../const.js";
+import {sortPointDay, sortPointPrice, sortPointTime} from "../utils/point.js";
 
 import PointPresenter from "../presenter/point.js";
 
@@ -25,15 +27,17 @@ export default class Trip {
 
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(points) {
     this._tripPoints = points.slice();
+    this._sourcedTripPoints = points.slice();
     // this._renderTripInfo();
     // this._renderTripCost();
     // this._renderSiteMenu();
     // this._renderFilter();
-    // this._renderSort();
+    this._renderSort();
     this._renderPointList();
     this._renderPoints();
   }
@@ -68,6 +72,7 @@ export default class Trip {
 
   _renderSort() {
     render(this._siteMainElement.querySelector(`.trip-events`), this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _handlePointChange(updatedPoint) {
@@ -75,6 +80,31 @@ export default class Trip {
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
   }
 
+  _sortTasks(sortType) {
+    switch (sortType) {
+      case SortType.PRICE:
+        this._tripPoints.sort(sortPointPrice);
+        break;
+      case SortType.TIME:
+        this._tripPoints.sort(sortPointTime);
+        break;
+      case SortType.DAY:
+        this._tripPoints.sort(sortPointDay);
+        break;
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortTasks(sortType);
+    this._clearPointList();
+    this._renderPoints();
+  }
   _renderPointList() {
     render(this._siteMainElement.querySelector(`.trip-events`), this._tripPointListComponent, RenderPosition.BEFOREEND);
   }

@@ -34,3 +34,17 @@ export const getDuration = (start, end) => {
   duration += minuteDuration ? minuteDuration.toString().padStart(2, `0`) + `M ` : ``;
   return duration;
 };
+
+export const sortPointDay = (pointA, pointB) => {
+  return pointB.date - pointA.date;
+};
+
+export const sortPointPrice = (pointA, pointB) => {
+  return pointB.price - pointA.price;
+};
+
+export const sortPointTime = (pointA, pointB) => {
+  const durationA = dayjs(pointA.timeStart).diff(dayjs(pointA.timeEnd), `minute`);
+  const durationB = dayjs(pointB.timeStart).diff(dayjs(pointB.timeEnd), `minute`);
+  return durationA - durationB;
+};
