@@ -1,6 +1,8 @@
 import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS, BLANK_POINT} from "../const";
-import AbstracView from "./abstract.js";
+import SmartView from "./smart.js";
 import {getEventCreationDate, getIcon} from "../utils/point";
+import {getOffers, generateDescription, generatePhotos} from "../mock/trip-point.js";
+
 
 const eventTypeListTemplate = () => {
   return `<div class="event__type-list">
@@ -35,8 +37,8 @@ const eventOfferListTemplate = (offers) => {
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
         ${offers.map((offer) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}">
-        <label class="event__offer-label" for="event-offer-${offer.id}">
+        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.selected ? `checked` : ``}>
+        <label class="event__offer-label" for="${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
@@ -65,8 +67,8 @@ const eventDestinationTemplate = (destination, photos, description) => {
       </section>` : ``}`;
 };
 
-const createEventEditTemplate = (point) => {
-  const {destination, photos, description, timeStart, timeEnd, offers, type, price} = point;
+const createEventEditTemplate = (data) => {
+  const {destination, photos, description, timeStart, timeEnd, offers, type, price} = data;
 
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = timeStart !== null ? getEventCreationDate(timeStart) : ``;
@@ -131,17 +133,129 @@ const createEventEditTemplate = (point) => {
   </li>`;
 };
 
-export default class EventEdit extends AbstracView {
+export default class EventEdit extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
-    this._point = point;
+    this._data = EventEdit.parsePointToData(point);
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._startTimeInputHandler = this._startTimeInputHandler.bind(this);
+    this._endTimeInputHandler = this._endTimeInputHandler.bind(this);
+    this._eventTypeToggleHandler = this._eventTypeToggleHandler.bind(this);
+    this._eventDestinationSwitchHandler = this._eventDestinationSwitchHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  reset(point) {
+    this.updateData(
+        EventEdit.parsePointToData(point)
+    );
   }
 
   getTemplate() {
-    return createEventEditTemplate(this._point);
+    return createEventEditTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseClickHandler(this._callback.closeClick);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-group`)
+      .addEventListener(`click`, this._eventTypeToggleHandler);
+
+    this.getElement()
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`change`, this._eventDestinationSwitchHandler);
+
+    this.getElement()
+      .querySelector(`.event__input--price`)
+      .addEventListener(`input`, this._priceInputHandler);
+
+    this.getElement()
+      .querySelector(`input[name=event-start-time]`)
+      .addEventListener(`input`, this._startTimeInputHandler);
+
+    this.getElement()
+      .querySelector(`input[name=event-end-time]`)
+      .addEventListener(`input`, this._endTimeInputHandler);
+
+    const offersElement = this.getElement().querySelector(`.event__available-offers`);
+    if (offersElement !== null) {
+      offersElement.addEventListener(`change`, this._offersChangeHandler);
+    }
+  }
+
+  _eventTypeToggleHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.classList.contains(`event__type-label`)) {
+      const type = evt.target.innerText;
+      // TODO get from API
+      const offers = getOffers(type, true);
+
+      this.updateData({
+        type,
+        offers
+      });
+    }
+  }
+
+  _eventDestinationSwitchHandler(evt) {
+    evt.preventDefault();
+    const destination = evt.target.value;
+    let description = ``;
+    let photos = [];
+
+    if (TRIP_POINT_DESTINATIONS.includes(destination)) {
+      // TODO get from API
+      description = generateDescription();
+      photos = generatePhotos();
+    }
+
+    this.updateData({
+      destination,
+      description,
+      photos
+    });
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: evt.target.value
+    }, true);
+  }
+
+  _startTimeInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      timeStart: evt.target.value
+    }, true);
+  }
+
+  _endTimeInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      timeEnd: evt.target.value
+    }, true);
+  }
+
+  _offersChangeHandler(evt) {
+    const id = evt.target.getAttribute(`id`);
+    const index = this._data.offers.findIndex((item) => item.id === id);
+    let offers = this._data.offers.slice();
+    offers[index].selected = evt.target.checked;
+    // this.updateData({
+    //   offers
+    // }, true);
+
   }
 
   _closeClickHandler(evt) {
@@ -151,7 +265,7 @@ export default class EventEdit extends AbstracView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._point);
+    this._callback.formSubmit(EventEdit.parseDataToPoint(this._data));
   }
 
   setFormSubmitHandler(callback) {
@@ -162,5 +276,15 @@ export default class EventEdit extends AbstracView {
   setCloseClickHandler(callback) {
     this._callback.closeClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+  }
+
+  static parsePointToData(point) {
+    let data = Object.assign({}, point);
+    data.offers = point.offers.slice();
+    return data;
+  }
+
+  static parseDataToPoint(data) {
+    return Object.assign({}, data);
   }
 }
