@@ -248,13 +248,17 @@ export default class EventEdit extends SmartView {
   }
 
   _offersChangeHandler(evt) {
-    const id = evt.target.getAttribute(`id`);
-    const index = this._data.offers.findIndex((item) => item.id === id);
-    let offers = this._data.offers.slice();
-    offers[index].selected = evt.target.checked;
-    // this.updateData({
-    //   offers
-    // }, true);
+    this.updateData({
+      offers: Object.assign(
+          {},
+          this._data.offers,
+          {[evt.target.dataset.value]: Object.assign(
+              {},
+              this._data.offers[evt.target.dataset.value],
+              {selected: evt.target.checked}
+          )}
+      )
+    }, true);
 
   }
 
