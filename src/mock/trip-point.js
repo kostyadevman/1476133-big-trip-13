@@ -27,7 +27,7 @@ const generateDestination = () => {
   return destinations[randomIndex];
 };
 
-const generateDescription = () => {
+export const generateDescription = () => {
   const descriptions = [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
     `Cras aliquet varius magna, non porta ligula feugiat eget.`,
@@ -71,7 +71,8 @@ const generateOffers = () => {
       id: nanoid(),
       type: generateType(),
       title: generateTitle(),
-      price: generatePrice()
+      price: generatePrice(),
+      selected: Boolean(getRandomInteger(0, 1))
     };
   };
 
@@ -80,12 +81,21 @@ const generateOffers = () => {
 
 const offers = generateOffers();
 
-const getOffers = (type) => {
+export const getOffers = (type, pure = false) => {
   const offerCount = getRandomInteger(0, POINT_OFFER_COUNT_MAX);
-  return offers.filter((item) => item.type === type).slice(0, offerCount) || [];
+  let offersByType = offers.filter((item) => item.type === type).slice(0, offerCount) || [];
+  if (pure) {
+    offersByType.map((offer) => {
+      Object.assign(
+          offer,
+          {selected: false}
+      );
+    });
+  }
+  return offersByType;
 };
 
-const generatePhotos = () => {
+export const generatePhotos = () => {
   const photos = [];
   const getPhoto = () => {
     return `http://picsum.photos/248/152?r=${Math.random()}`;
