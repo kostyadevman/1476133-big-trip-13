@@ -5,12 +5,11 @@ const createTripPointListTemplate = () => {
 };
 
 export default class TripPointList extends AbstracView {
-  constructor(points) {
+  constructor() {
     super();
-    this._points = points;
   }
 
   getTemplate() {
-    return createTripPointListTemplate(this._points);
+    return createTripPointListTemplate();
   }
 }
