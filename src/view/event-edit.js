@@ -4,24 +4,24 @@ import {getEventCreationDate, getIcon} from "../utils/point";
 import {getOffers, generateDescription, generatePhotos} from "../mock/trip-point.js";
 import flatpickr from "flatpickr";
 
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import "flatpickr/dist/flatpickr.min.css";
 
 
-const eventTypeListTemplate = () => {
+const eventTypeListTemplate = (id) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
       ${TRIP_POINT_TYPES.map((type) => `
       <div class="event__type-item">
         <input
-            id="event-type-${type.toLowerCase()}-1"
+            id="event-type-${type.toLowerCase()}-${id}"
             class="event__type-input  visually-hidden"
             type="radio" name="event-type"
             value="${type.toLowerCase()}"
         >
         <label
             class="event__type-label  event__type-label--${type.toLowerCase()}"
-            for="event-type-${type.toLowerCase()}-1"
+            for="event-type-${type.toLowerCase()}-${id}"
             >${type}</label
         >
       </div>`).join(``)}
@@ -71,12 +71,12 @@ const eventDestinationTemplate = (destination, photos, description) => {
 };
 
 const createEventEditTemplate = (data) => {
-  const {destination, photos, description, timeStart, timeEnd, offers, type, price} = data;
+  const {id, destination, photos, description, timeStart, timeEnd, offers, type, price} = data;
 
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = timeStart !== null ? getEventCreationDate(timeStart) : ``;
   const eventEndDate = timeEnd !== null ? getEventCreationDate(timeEnd) : ``;
-  const typeList = eventTypeListTemplate();
+  const typeList = eventTypeListTemplate(id);
   const options = eventOptionListTemplate();
   const offerList = eventOfferListTemplate(offers);
   const icon = getIcon(type);
@@ -85,40 +85,40 @@ const createEventEditTemplate = (data) => {
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
-          <label class="event__type  event__type-btn" for="event-type-toggle-1">
+          <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="${icon}" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
 
           ${typeList}
 
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">
+          <label class="event__label  event__type-output" for="event-destination-${id}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
-          <datalist id="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}">
+          <datalist id="destination-list-${id}">
               ${options}
           </datalist>
         </div>
 
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartDate}">
+          <label class="visually-hidden" for="event-start-time-${id}">From</label>
+          <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${eventStartDate}">
           &mdash;
-          <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndDate}">
+          <label class="visually-hidden" for="event-end-time-${id}">To</label>
+          <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${eventEndDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
-          <label class="event__label" for="event-price-1">
+          <label class="event__label" for="event-price-${id}">
             <span class="visually-hidden">${price}</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price ? price : ``}">
+          <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${price ? price : ``}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -145,6 +145,7 @@ export default class EventEdit extends SmartView {
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._startTimeInputHandler = this._startTimeInputHandler.bind(this);
     this._endTimeInputHandler = this._endTimeInputHandler.bind(this);
@@ -154,6 +155,11 @@ export default class EventEdit extends SmartView {
 
     this._setInnerHandlers();
     this._setDatepickers();
+  }
+
+  removeElement() {
+    super.removeElement();
+    this._removeDatepickers();
   }
 
   reset(point) {
@@ -171,9 +177,10 @@ export default class EventEdit extends SmartView {
     this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseClickHandler(this._callback.closeClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
-  _setDatepickers() {
+  _removeDatepickers() {
     if (this._datepickerStart) {
       this._datepickerStart.destroy();
       this._datepickerStart = null;
@@ -182,9 +189,12 @@ export default class EventEdit extends SmartView {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
+  }
 
+  _setDatepickers() {
+    this._removeDatepickers();
     this._datepickerStart = flatpickr(
-        this.getElement().querySelector(`#event-start-time-1`),
+        this.getElement().querySelector(`input[name=event-start-time]`),
         {
           dateFormat: `d/m/Y H:i`,
           defaultDate: this._data.timeStart,
@@ -194,7 +204,7 @@ export default class EventEdit extends SmartView {
     );
 
     this._datepickerEnd = flatpickr(
-        this.getElement().querySelector(`#event-end-time-1`),
+        this.getElement().querySelector(`input[name=event-end-time]`),
         {
           dateFormat: `d/m/Y H:i`,
           defaultDate: this._data.timeEnd,
@@ -267,6 +277,9 @@ export default class EventEdit extends SmartView {
     this.updateData({
       timeStart: userDate
     }, true);
+    this.updateData({
+      date: userDate
+    }, true);
   }
 
   _endTimeInputHandler([userDate]) {
@@ -303,6 +316,16 @@ export default class EventEdit extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EventEdit.parseDataToPoint(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   setCloseClickHandler(callback) {

@@ -25,6 +25,12 @@ export const FILTERS = [
   `Past`
 ];
 
+export const FilterType = {
+  EVERYTHING: `Everything`,
+  FUTURE: `Future`,
+  PAST: `Past`
+};
+
 export const SortType = {
   DAY: `Day`,
   EVENT: `Event`,
@@ -47,4 +53,16 @@ export const BLANK_POINT = {
   destination: ``,
   offers: [],
   photos: []
+};
+
+export const UserAction = {
+  UPDATE_POINT: `UPDATE_POINT`,
+  ADD_POINT: `ADD_POINT`,
+  DELETE_POINT: `DELETE_POINT`,
+};
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
 };

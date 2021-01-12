@@ -2,7 +2,9 @@ import {TRIP_POINT_TYPES, TRIP_POINT_DESTINATIONS, BLANK_POINT} from "../const";
 import SmartView from "./smart.js";
 import {getEventCreationDate, getIcon} from "../utils/point";
 import {getOffers, generateDescription, generatePhotos} from "../mock/trip-point.js";
+import flatpickr from "flatpickr";
 
+import "flatpickr/dist/flatpickr.min.css";
 
 const eventTypeListTemplate = () => {
   return `<div class="event__type-list">
@@ -119,10 +121,7 @@ const createEventEditTemplate = (data) => {
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
       <section class="event__details">
         ${offerList}
@@ -133,12 +132,16 @@ const createEventEditTemplate = (data) => {
   </li>`;
 };
 
-export default class EventCreate extends SmartView {
+export default class EventNew extends SmartView {
   constructor(point = BLANK_POINT) {
     super();
-    this._data = EventCreate.parsePointToData(point);
+    this._data = EventNew.parsePointToData(point);
+    this._datepickerStart = null;
+    this._datepickerEnd = null;
 
-    this._closeClickHandler = this._closeClickHandler.bind(this);
+    this._form = this.getElement().querySelector(`form`);
+
+    this._cancelClickHandler = this._cancelClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._startTimeInputHandler = this._startTimeInputHandler.bind(this);
@@ -148,11 +151,17 @@ export default class EventCreate extends SmartView {
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
+  }
+
+  removeElement() {
+    super.removeElement();
+    this._removeDatepickers();
   }
 
   reset(point) {
     this.updateData(
-        EventCreate.parsePointToData(point)
+        EventNew.parsePointToData(point)
     );
   }
 
@@ -160,10 +169,47 @@ export default class EventCreate extends SmartView {
     return createEventEditTemplate(this._data);
   }
 
+  _removeDatepickers() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+  }
+
+  _setDatepickers() {
+    this._removeDatepickers();
+    this._datepickerStart = flatpickr(
+
+        this.getElement().querySelector(`input[name=event-start-time]`),
+        {
+          dateFormat: `d/m/Y H:i`,
+          defaultDate: this._data.timeStart,
+          enableTime: true,
+          onChange: this._startTimeInputHandler
+        }
+    );
+
+    this._datepickerEnd = flatpickr(
+        this.getElement().querySelector(`input[name=event-end-time]`),
+        {
+          dateFormat: `d/m/Y H:i`,
+          defaultDate: this._data.timeEnd,
+          enableTime: true,
+          onChange: this._endTimeInputHandler
+        }
+    );
+  }
+
+
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCloseClickHandler(this._callback.closeClick);
+    this.setCancelClickHandler(this._callback.closeClick);
   }
 
   _setInnerHandlers() {
@@ -226,24 +272,47 @@ export default class EventCreate extends SmartView {
     });
   }
 
+  _validatePrice() {
+    function isNumeric(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    const priceElem = this.getElement().querySelector(`.event__input--price`);
+    priceElem.setCustomValidity(``);
+
+    if (!isNumeric(priceElem.value)) {
+      priceElem.setCustomValidity(`Numbers only`);
+    }
+  }
+
+  // _validateDestination() {
+  //   const DestinationElem = this._form.querySelector(`.event__input--destination`);
+  //   DestinationElem.setCustomValidity(``);
+  //   console.log(TRIP_POINT_DESTINATIONS);
+  //   if (!TRIP_POINT_DESTINATIONS.includes(DestinationElem.value)) {
+  //     DestinationElem.setCustomValidity(`Choose destination from list below`);
+  //   }
+  // }
+
   _priceInputHandler(evt) {
     evt.preventDefault();
+    this._validatePrice();
     this.updateData({
-      price: evt.target.value
+      price: Number(evt.target.value)
     }, true);
   }
 
-  _startTimeInputHandler(evt) {
-    evt.preventDefault();
+  _startTimeInputHandler([userDate]) {
     this.updateData({
-      timeStart: evt.target.value
+      timeStart: userDate
+    }, true);
+    this.updateData({
+      date: userDate
     }, true);
   }
 
-  _endTimeInputHandler(evt) {
-    evt.preventDefault();
+  _endTimeInputHandler([userDate]) {
     this.updateData({
-      timeEnd: evt.target.value
+      timeEnd: userDate
     }, true);
   }
 
@@ -262,24 +331,28 @@ export default class EventCreate extends SmartView {
 
   }
 
-  _closeClickHandler(evt) {
+  _cancelClickHandler(evt) {
     evt.preventDefault();
-    this._callback.closeClick();
+    this._removeDatepickers();
+    this._callback.cancelClick();
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(EventCreate.parseDataToPoint(this._data));
+    this._removeDatepickers();
+    this._callback.formSubmit(EventNew.parseDataToPoint(this._data));
   }
 
   setFormSubmitHandler(callback) {
+    // this._validateDestination();
+    this._validatePrice();
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
   }
 
-  setCloseClickHandler(callback) {
-    this._callback.closeClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+  setCancelClickHandler(callback) {
+    this._callback.cancelClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._cancelClickHandler);
   }
 
   static parsePointToData(point) {

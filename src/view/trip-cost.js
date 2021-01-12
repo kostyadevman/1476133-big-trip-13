@@ -3,7 +3,7 @@ import AbstracView from "./abstract.js";
 const getTotalCost = (tripPoints) => {
   const initialValue = 0;
   return tripPoints.reduce((total, currentValue) => {
-    return total + currentValue.price;
+    return total + Number(currentValue.price);
   }, initialValue);
 };
 
