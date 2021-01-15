@@ -209,7 +209,7 @@ export default class EventNew extends SmartView {
     this._setInnerHandlers();
     this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCancelClickHandler(this._callback.closeClick);
+    this.setCancelClickHandler(this._callback.cancelClick);
   }
 
   _setInnerHandlers() {

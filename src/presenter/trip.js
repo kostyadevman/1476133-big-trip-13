@@ -6,7 +6,7 @@ import SortView from "../view/sort.js";
 import TripPointListView from "../view/trip-point-list.js";
 import NoTripPoint from "../view/no-trip-point.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
-import {SortType, UpdateType, UserAction, FilterType} from "../const.js";
+import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
 import {sortPointDay, sortPointPrice, sortPointTime} from "../utils/point.js";
 
@@ -33,11 +33,12 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderTripEvents();
   }
 
@@ -108,10 +109,7 @@ export default class Trip {
     }
   }
 
-  createNewPoint() {
-    this._currentSortType = SortType.DAY;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-
+  createNewPoint(callback) {
     if (this._noTripPointComponent !== null) {
       remove(this._noTripPointComponent);
     }
@@ -121,7 +119,7 @@ export default class Trip {
     }
 
     this._pointNewPresenter = new PointNewPresenter(this._tripPointListComponent, this._handleViewAction);
-    this._pointNewPresenter.init();
+    this._pointNewPresenter.init(callback);
   }
 
   _handleSortTypeChange(sortType) {
@@ -198,6 +196,13 @@ export default class Trip {
     this._renderPoints();
     this._renderSort();
 
+  }
+
+  destroy() {
+    this._clearTripEvents({resetSortType: true});
+
+    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
 }
