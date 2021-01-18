@@ -36,7 +36,7 @@ export const getDuration = (start, end) => {
 };
 
 export const sortPointDay = (pointA, pointB) => {
-  return pointA.date - pointB.date;
+  return dayjs(pointA.date) - dayjs(pointB.date);
 };
 
 export const sortPointPrice = (pointA, pointB) => {

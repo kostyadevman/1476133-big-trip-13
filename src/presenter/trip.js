@@ -1,10 +1,7 @@
-// import TripInfoView from "../view/trip-info.js";
-// import TripCostView from "../view/trip-cost.js";
-// import SiteMenuView from "../view/site-menu.js";
-// import FilterView from "../view/filter.js";
 import SortView from "../view/sort.js";
 import TripPointListView from "../view/trip-point-list.js";
 import NoTripPoint from "../view/no-trip-point.js";
+import LoadingView from "../view/loading.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
@@ -15,18 +12,21 @@ import PointNewPresenter from "../presenter/point-new.js";
 
 
 export default class Trip {
-  constructor(siteMainElement, pointsModel, filterModel) {
+  constructor(siteMainElement, pointsModel, filterModel, api) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._pointPresenter = {};
     this._pointNewPresenter = null;
     this._currentSortType = SortType.DAY;
     this._siteMainElement = siteMainElement;
+    this._isLoading = true;
+    this._api = api;
 
     this._addEventComponent = null;
     this._sortComponent = null;
     this._tripPointListComponent = null;
     this._noTripPointComponent = null;
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -82,7 +82,9 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update).then((response) => {
+          this._pointsModel.updatePoint(updateType, response);
+        });
         break;
       case UserAction.ADD_POINT:
         this._pointsModel.addPoint(updateType, update);
@@ -104,6 +106,11 @@ export default class Trip {
         break;
       case UpdateType.MAJOR:
         this._clearTripEvents({resetSortType: true});
+        this._renderTripEvents();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTripEvents();
         break;
     }
@@ -152,6 +159,10 @@ export default class Trip {
     points.forEach((point) => this._renderPoint(point));
   }
 
+  _renderLoading() {
+    render(this._siteMainElement, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
   _renderNoPoints() {
     if (this._noTripPointComponent !== null) {
       this._noTripPointComponent = null;
@@ -176,6 +187,7 @@ export default class Trip {
     remove(this._sortComponent);
     remove(this._noTripPointComponent);
     remove(this._tripPointListComponent);
+    remove(this._loadingComponent);
 
     this._tripPointListComponent = null;
 
@@ -185,6 +197,11 @@ export default class Trip {
   }
 
   _renderTripEvents() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
 
     if (points.length === 0) {

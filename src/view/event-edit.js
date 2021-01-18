@@ -52,9 +52,9 @@ const eventOfferListTemplate = (offers) => {
 };
 
 const eventPhotoListTemplate = (photos) => {
-  return `${photos !== [] ? `<div class="event__photos-container">
+  return `${photos.length !== 0 ? `<div class="event__photos-container">
         <div class="event__photos-tape">
-          ${photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
         </div>
       </div>` : ``}`;
 };
