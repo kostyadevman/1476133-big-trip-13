@@ -5,7 +5,7 @@ import LoadingView from "../view/loading.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
-import {sortPointDay, sortPointPrice, sortPointTime} from "../utils/point.js";
+import {sortPointDay, sortPointPrice, sortPointTime, adaptToClient} from "../utils/point.js";
 
 import PointPresenter from "../presenter/point.js";
 import PointNewPresenter from "../presenter/point-new.js";
@@ -83,7 +83,8 @@ export default class Trip {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this._api.updatePoint(update).then((response) => {
-          this._pointsModel.updatePoint(updateType, response);
+          const point = adaptToClient(response);
+          this._pointsModel.updatePoint(updateType, point);
         });
         break;
       case UserAction.ADD_POINT:

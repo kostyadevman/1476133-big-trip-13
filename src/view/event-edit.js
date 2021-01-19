@@ -39,8 +39,8 @@ const eventOfferListTemplate = (offers) => {
   return `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-        ${offers.map((offer) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.selected ? `checked` : ``}>
+        ${offers.map((offer, index) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" data-value="${index}" id="${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offer.selected ? `checked` : ``}>
         <label class="event__offer-label" for="${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -289,17 +289,28 @@ export default class EventEdit extends SmartView {
   }
 
   _offersChangeHandler(evt) {
+    const offersChanged = this._data.offers.slice();
+    offersChanged[evt.target.dataset.value] = Object.assign(
+        {},
+        offersChanged[evt.target.dataset.value],
+        {selected: evt.target.checked}
+    );
     this.updateData({
-      offers: Object.assign(
-          {},
-          this._data.offers,
-          {[evt.target.dataset.value]: Object.assign(
-              {},
-              this._data.offers[evt.target.dataset.value],
-              {selected: evt.target.checked}
-          )}
-      )
+      offers: offersChanged,
     }, true);
+
+
+    // this.updateData({
+    //   offers: Object.assign(
+    //       {},
+    //       this._data.offers,
+    //       {[evt.target.dataset.value]: Object.assign(
+    //           {},
+    //           this._data.offers[evt.target.dataset.value],
+    //           {selected: evt.target.checked}
+    //       )}
+    //   )
+    // }, true);
 
   }
 

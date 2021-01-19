@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import {generateId} from "../mock/trip-point";
 
 export const humanizePointEventDate = (date) => {
   return dayjs(date).format(`MMM DD`);
@@ -56,4 +57,29 @@ export const isEventFuture = (eventDate) => {
 
 export const isEventPast = (eventDate) => {
   return eventDate === null ? false : dayjs().isAfter(eventDate, `D`);
+};
+
+export const adaptToClient = (point) => {
+  const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        date: point.date_from,
+        timeStart: point.date_from,
+        timeEnd: point.date_to,
+        price: point.base_price,
+        description: point.destination.description,
+        photos: point.destination.pictures,
+        destination: point.destination.name,
+        offers: point.offers.map((offer) => Object.assign(offer, {selected: true, id: generateId()})),
+        isFavorite: point.is_favorite
+      }
+  );
+
+  delete adaptedPoint.date_from;
+  delete adaptedPoint.date_to;
+  delete adaptedPoint.base_price;
+  delete adaptedPoint.is_favorite;
+
+  return adaptedPoint;
 };

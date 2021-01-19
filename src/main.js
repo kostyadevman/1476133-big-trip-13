@@ -14,7 +14,7 @@ import Api from "./api.js";
 // import {generateTripPoint} from "./mock/trip-point";
 //
 // const TRIP_POINT_COUNT = 1;
-const AUTHORIZATION = `Basic fS3sf3dfKwcl7sa0B`;
+const AUTHORIZATION = `Basic rS3sf3dfKwcl7sa0B`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 // const points = new Array(TRIP_POINT_COUNT).fill().map(generateTripPoint);
