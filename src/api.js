@@ -1,4 +1,5 @@
-import PointsModel from "./model/points.js";
+// import PointsModel from "./model/points.js";
+import {adaptToClient, adaptToServer} from "./utils/point.js";
 
 const Method = {
   GET: `GET`,
@@ -16,17 +17,27 @@ export default class Api {
     this._authorization = authorization;
   }
 
+  getOffers() {
+    return this._load({url: `offers`})
+      .then(Api.toJSON);
+  }
+
+  getDestinations() {
+    return this._load({url: `destinations`})
+      .then(Api.toJSON);
+  }
+
   getPoints() {
     return this._load({url: `points`})
       .then(Api.toJSON)
-      .then((points) => points.map(PointsModel.adaptToClient));
+      .then((points) => points.map(adaptToClient));
   }
 
   updatePoint(point) {
     return this._load({
       url: `points/${point.id}`,
       method: Method.PUT,
-      body: JSON.stringify(PointsModel.adaptToServer(point)),
+      body: JSON.stringify(adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then(Api.toJSON);

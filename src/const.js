@@ -19,12 +19,6 @@ export const TRIP_POINT_DESTINATIONS = [
   `Paris`,
 ];
 
-export const FILTERS = [
-  `Everything`,
-  `Future`,
-  `Past`
-];
-
 export const FilterType = {
   EVERYTHING: `Everything`,
   FUTURE: `Future`,
@@ -39,16 +33,11 @@ export const SortType = {
   OFFERS: `Offers`
 };
 
-export const MENU_ITEMS = [
-  `Table`,
-  `Stats`
-];
-
 export const BLANK_POINT = {
   type: `Taxi`,
   timeStart: null,
   timeEnd: null,
-  price: null,
+  price: 0,
   description: ``,
   destination: ``,
   offers: [],

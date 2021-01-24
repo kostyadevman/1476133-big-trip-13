@@ -9,8 +9,10 @@ const Mode = {
 };
 
 export default class Point {
-  constructor(tripPointListContainer, changeData, changeMode) {
+  constructor(tripPointListContainer, offersModel, destinationsModel, changeData, changeMode) {
     this._tripPointListContainer = tripPointListContainer;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -32,14 +34,20 @@ export default class Point {
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
+    this._offers = this._offersModel.getOffers();
+    this._destinations = this._destinationsModel.getDestinations();
+
     this._pointComponent = new TripPointView(this._point);
-    this._pointEditComponent = new EventEditView(this._point);
+    this._pointEditComponent = new EventEditView(this._offers, this._destinations, this._point);
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setCloseClickHandler(this._closeButtonClickHandler);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+
+    this._offers = this._offersModel.getOffers();
+    this._destinations = this._destinationsModel.getDestinations();
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._tripPointListContainer, this._pointComponent, RenderPosition.BEFOREEND);

@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import {generateId} from "../mock/trip-point";
 
 export const humanizePointEventDate = (date) => {
   return dayjs(date).format(`MMM DD`);
@@ -59,6 +58,10 @@ export const isEventPast = (eventDate) => {
   return eventDate === null ? false : dayjs().isAfter(eventDate, `D`);
 };
 
+export const _getOffersByType = (offers, type) => {
+  return offers.find((item) => item.type === type.toLowerCase()).offers;
+};
+
 export const adaptToClient = (point) => {
   const adaptedPoint = Object.assign(
       {},
@@ -71,7 +74,7 @@ export const adaptToClient = (point) => {
         description: point.destination.description,
         photos: point.destination.pictures,
         destination: point.destination.name,
-        offers: point.offers.map((offer) => Object.assign(offer, {selected: true, id: generateId()})),
+        offers: point.offers,
         isFavorite: point.is_favorite
       }
   );
@@ -80,6 +83,38 @@ export const adaptToClient = (point) => {
   delete adaptedPoint.date_to;
   delete adaptedPoint.base_price;
   delete adaptedPoint.is_favorite;
+
+  return adaptedPoint;
+};
+
+export const adaptToServer = (point) => {
+  const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        "date_from": point.timeStart,
+        "date_to": point.timeEnd,
+        "is_favorite": point.isFavorite,
+        "base_price": point.price,
+        "destination": Object.assign(
+            {},
+            {
+              name: point.destination,
+              description: point.description,
+              pictures: point.photos
+            }
+        ),
+        "offers": point.offers
+      }
+  );
+
+  delete adaptedPoint.date;
+  delete adaptedPoint.timeStart;
+  delete adaptedPoint.timeEnd;
+  delete adaptedPoint.isFavorite;
+  delete adaptedPoint.price;
+  delete adaptedPoint.description;
+  delete adaptedPoint.photos;
 
   return adaptedPoint;
 };

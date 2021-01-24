@@ -12,9 +12,11 @@ import PointNewPresenter from "../presenter/point-new.js";
 
 
 export default class Trip {
-  constructor(siteMainElement, pointsModel, filterModel, api) {
+  constructor(siteMainElement, pointsModel, filterModel, offersModel, destinationsModel, api) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._pointPresenter = {};
     this._pointNewPresenter = null;
     this._currentSortType = SortType.DAY;
@@ -22,7 +24,7 @@ export default class Trip {
     this._isLoading = true;
     this._api = api;
 
-    this._addEventComponent = null;
+    // this._addEventComponent = null;
     this._sortComponent = null;
     this._tripPointListComponent = null;
     this._noTripPointComponent = null;
@@ -37,6 +39,7 @@ export default class Trip {
 
   init() {
     this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
     this._renderTripEvents();
@@ -126,7 +129,7 @@ export default class Trip {
       this._renderPointList();
     }
 
-    this._pointNewPresenter = new PointNewPresenter(this._tripPointListComponent, this._handleViewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._tripPointListComponent, this._offersModel, this._destinationsModel, this._handleViewAction);
     this._pointNewPresenter.init(callback);
   }
 
@@ -150,7 +153,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._tripPointListComponent, this._handleViewAction, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._tripPointListComponent, this._offersModel, this._destinationsModel, this._handleViewAction, this._handleModeChange);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
@@ -184,7 +187,7 @@ export default class Trip {
 
     this._pointPresenter = {};
 
-    remove(this._addEventComponent);
+    // remove(this._addEventComponent);
     remove(this._sortComponent);
     remove(this._noTripPointComponent);
     remove(this._tripPointListComponent);
