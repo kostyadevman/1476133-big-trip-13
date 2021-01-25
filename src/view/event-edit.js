@@ -6,7 +6,7 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
 
-const eventTypeListTemplate = (types) => {
+const eventTypeListTemplate = (types, isDisabled) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
@@ -17,6 +17,7 @@ const eventTypeListTemplate = (types) => {
             class="event__type-input  visually-hidden"
             type="radio" name="event-type"
             value="${type.toLowerCase()}"
+            ${isDisabled ? `disabled` : ``}
         >
         <label
             class="event__type-label  event__type-label--${type.toLowerCase()}"
@@ -34,12 +35,19 @@ const eventOptionListTemplate = (destinations) => {
   ).join(``)}`;
 };
 
-const eventOfferListTemplate = (offers) => {
+const eventOfferListTemplate = (offers, isDisabled) => {
   return `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
         ${offers.map((offer, index) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" data-value="${index}" id="${index}" type="checkbox" name="event-offer-${index}" ${offer.selected ? `checked` : ``}>
+        <input
+          class="event__offer-checkbox  visually-hidden"
+          data-value="${index}" id="${index}"
+          type="checkbox"
+          name="event-offer-${index}"
+          ${offer.selected ? `checked` : ``}
+          ${isDisabled ? `disabled` : ``}
+        >
         <label class="event__offer-label" for="${index}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -51,7 +59,7 @@ const eventOfferListTemplate = (offers) => {
 };
 
 const eventPhotoListTemplate = (photos) => {
-  return `${photos.length !== 0 ? `<div class="event__photos-container">
+  return `${typeof photos !== `undefined` && photos.length !== 0 ? `<div class="event__photos-container">
         <div class="event__photos-tape">
           ${photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
         </div>
@@ -59,6 +67,7 @@ const eventPhotoListTemplate = (photos) => {
 };
 
 const eventDestinationTemplate = (destination, photos, description) => {
+
   const photoList = eventPhotoListTemplate(photos);
   return `${destination !== `` ? `<section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -70,8 +79,21 @@ const eventDestinationTemplate = (destination, photos, description) => {
 };
 
 const createEventEditTemplate = (data, offersAll, destinations) => {
-  const {id, destination, photos, description, timeStart, timeEnd, offers, type, price} = data;
-  const offerTitles = offers.map((item) => item.title);
+  const {
+    id,
+    destination,
+    photos,
+    description,
+    timeStart,
+    timeEnd,
+    offers,
+    type,
+    price,
+    isSaving,
+    isDisabled,
+    isDeleting
+  } = data;
+  const offerTitles = offers.map((item) => item.title) || [];
   let offersByTypeAll = _getOffersByType(offersAll, type);
 
   const offersSelected = offersByTypeAll.map((item) => {
@@ -83,9 +105,9 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = timeStart !== null ? getEventCreationDate(timeStart) : ``;
   const eventEndDate = timeEnd !== null ? getEventCreationDate(timeEnd) : ``;
-  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type));
+  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), isDisabled);
   const options = eventOptionListTemplate(destinations);
-  const offerList = eventOfferListTemplate(offersSelected);
+  const offerList = eventOfferListTemplate(offersSelected, isDisabled);
   const icon = getIcon(type);
 
   return `<li class="trip-events__item">
@@ -96,7 +118,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="${icon}" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
           ${typeList}
 
@@ -106,7 +128,15 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
           <label class="event__label  event__type-output" for="event-destination-${id}">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" autocomplete="off">
+          <input
+            class="event__input  event__input--destination"
+            id="event-destination-${id}"
+            type="text" name="event-destination"
+            value="${destination}"
+            list="destination-list-${id}"
+            autocomplete="off"
+            ${isDisabled ? `disabled` : ``}
+           >
           <datalist id="destination-list-${id}">
               ${options}
           </datalist>
@@ -114,10 +144,10 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-${id}">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${eventStartDate}">
+          <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${eventStartDate}" ${isDisabled ? `disabled` : ``}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-${id}">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${eventEndDate}">
+          <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${eventEndDate}" ${isDisabled ? `disabled` : ``}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -125,12 +155,16 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
             <span class="visually-hidden">${price}</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price ? price : `0`}" autocomplete="off">
+          <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price ? price : `0`}" autocomplete="off" ${isDisabled ? `disabled` : ``}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
+            ${isSaving ? `Saving` : `Save`}
+        </button>
+        <button class="event__reset-btn" type="reset">
+            ${isDeleting ? `Deleting...` : `Delete`}
+        </button>
+        <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
           <span class="visually-hidden">Open event</span>
         </button>
       </header>
