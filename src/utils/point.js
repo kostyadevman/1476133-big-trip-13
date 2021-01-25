@@ -36,7 +36,7 @@ export const getDuration = (start, end) => {
 };
 
 export const sortPointDay = (pointA, pointB) => {
-  return pointA.date - pointB.date;
+  return dayjs(pointA.date) - dayjs(pointB.date);
 };
 
 export const sortPointPrice = (pointA, pointB) => {
@@ -56,4 +56,65 @@ export const isEventFuture = (eventDate) => {
 
 export const isEventPast = (eventDate) => {
   return eventDate === null ? false : dayjs().isAfter(eventDate, `D`);
+};
+
+export const _getOffersByType = (offers, type) => {
+  return offers.find((item) => item.type === type.toLowerCase()).offers;
+};
+
+export const adaptToClient = (point) => {
+  const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        date: point.date_from,
+        timeStart: point.date_from,
+        timeEnd: point.date_to,
+        price: point.base_price,
+        description: point.destination.description,
+        photos: point.destination.pictures,
+        destination: point.destination.name,
+        offers: point.offers,
+        isFavorite: point.is_favorite
+      }
+  );
+
+  delete adaptedPoint.date_from;
+  delete adaptedPoint.date_to;
+  delete adaptedPoint.base_price;
+  delete adaptedPoint.is_favorite;
+
+  return adaptedPoint;
+};
+
+export const adaptToServer = (point) => {
+  const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        "date_from": point.timeStart,
+        "date_to": point.timeEnd,
+        "is_favorite": point.isFavorite,
+        "base_price": point.price,
+        "destination": Object.assign(
+            {},
+            {
+              name: point.destination,
+              description: point.description,
+              pictures: point.photos
+            }
+        ),
+        "offers": point.offers
+      }
+  );
+
+  delete adaptedPoint.date;
+  delete adaptedPoint.timeStart;
+  delete adaptedPoint.timeEnd;
+  delete adaptedPoint.isFavorite;
+  delete adaptedPoint.price;
+  delete adaptedPoint.description;
+  delete adaptedPoint.photos;
+
+  return adaptedPoint;
 };

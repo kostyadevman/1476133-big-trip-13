@@ -13,7 +13,7 @@ const getTripRoute = (points) => {
 };
 
 const getTripRouteDate = (points) => {
-  return `${getTripInfoDate(points[0].date)} - ${getTripInfoDate(points[points.length - 1].date)}`;
+  return points.length !== 0 ? `${getTripInfoDate(points[0].date)} - ${getTripInfoDate(points[points.length - 1].date)}` : ``;
 };
 
 const createTripInfoTemplate = (tripPoints) => {

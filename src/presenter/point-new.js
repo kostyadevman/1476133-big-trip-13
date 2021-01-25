@@ -4,9 +4,14 @@ import {remove, render, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
 export default class PointNew {
-  constructor(tripPointListContainer, changeData) {
+  constructor(tripPointListContainer, offersModel, destinationsModel, changeData) {
     this._tripPointListContainer = tripPointListContainer;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._changeData = changeData;
+
+    this._offers = null;
+    this._destinations = null;
 
     this._pointNewComponent = null;
     this._destroyCallback = null;
@@ -22,7 +27,10 @@ export default class PointNew {
       return;
     }
 
-    this._pointNewComponent = new EventNewView();
+    this._offers = this._offersModel.getOffers();
+    this._destinations = this._destinationsModel.getDestinations();
+
+    this._pointNewComponent = new EventNewView(this._offers, this._destinations);
     this._pointNewComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointNewComponent.setCancelClickHandler(this._handleCancelClick);
 
