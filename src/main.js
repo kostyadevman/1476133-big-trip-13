@@ -16,7 +16,7 @@ import {MenuItem, UpdateType, FilterType} from "./const.js";
 import {RenderPosition, render, remove} from "./utils/render.js";
 
 
-const AUTHORIZATION = `Basic OL3sf3dfKwcl7sa0B`;
+const AUTHORIZATION = `Basic SL3sf3dfKwcl7sa0B`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -72,19 +72,11 @@ const handleNewEventCancel = () => {
   siteMenuComponent.setMenuItem(MenuItem.TABLE);
 };
 
-const pOffers = api.getOffers()
-  .then((offers) => {
-    offersModel.setOffers(offers);
-    // console.log(`offers`, offers);
-  });
 
-const pDestination = api.getDestinations()
-  .then((destinations) => {
+api.getAllData()
+  .then(([offers, destinations, points]) => {
     destinationsModel.setDestinations(destinations);
-  });
-
-const pPoinsts = api.getPoints()
-  .then((points) => {
+    offersModel.setOffers(offers);
     pointsModel.setPoints(UpdateType.INIT, points);
     render(siteHeaderElement.querySelector(`.trip-controls h2:first-child`), siteMenuComponent, RenderPosition.AFTEREND);
     render(siteHeaderElement, addNewEventComponent, RenderPosition.BEFOREEND);
@@ -96,7 +88,5 @@ const pPoinsts = api.getPoints()
     render(siteHeaderElement, addNewEventComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
-
-Promise.all([pOffers, pDestination, pPoinsts]);
 
 

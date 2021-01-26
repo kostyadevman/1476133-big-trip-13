@@ -41,7 +41,11 @@ export const BLANK_POINT = {
   description: ``,
   destination: ``,
   offers: [],
-  photos: []
+  photos: [],
+  isFavorite: false,
+  isDisabled: false,
+  isSaving: false,
+  isDeleting: false
 };
 
 export const UserAction = {

@@ -75,7 +75,10 @@ export const adaptToClient = (point) => {
         photos: point.destination.pictures,
         destination: point.destination.name,
         offers: point.offers,
-        isFavorite: point.is_favorite
+        isFavorite: point.is_favorite,
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
       }
   );
 
@@ -92,6 +95,7 @@ export const adaptToServer = (point) => {
       {},
       point,
       {
+        "type": point.type.toLowerCase(),
         "date_from": point.timeStart,
         "date_to": point.timeEnd,
         "is_favorite": point.isFavorite,
@@ -115,6 +119,9 @@ export const adaptToServer = (point) => {
   delete adaptedPoint.price;
   delete adaptedPoint.description;
   delete adaptedPoint.photos;
+  delete adaptedPoint.isDisabled;
+  delete adaptedPoint.isSaving;
+  delete adaptedPoint.isDeleting;
 
   return adaptedPoint;
 };
