@@ -58,7 +58,7 @@ export const isEventPast = (eventDate) => {
   return eventDate === null ? false : dayjs().isAfter(eventDate, `D`);
 };
 
-export const _getOffersByType = (offers, type) => {
+export const getOffersByType = (offers, type) => {
   return offers.find((item) => item.type === type.toLowerCase()).offers;
 };
 

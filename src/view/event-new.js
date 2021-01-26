@@ -1,11 +1,12 @@
-import {BLANK_POINT} from "../const.js";
 import SmartView from "./smart.js";
 import {getEventCreationDate, getIcon} from "../utils/point.js";
+import {getOffersByType} from "../utils/point";
 import dayjs from "dayjs";
 import flatpickr from "flatpickr";
 
 import "flatpickr/dist/flatpickr.min.css";
-import {_getOffersByType} from "../utils/point";
+
+import {BLANK_POINT} from "../const.js";
 
 
 const eventTypeListTemplate = (types, isDisabled) => {
@@ -83,7 +84,7 @@ const eventDestinationTemplate = (destination, photos, description) => {
 const createEventEditTemplate = (data, offersAll, destinations) => {
   const {destination, photos, description, type, price, isDisabled, isSaving} = data;
 
-  const offersByTypeAll = _getOffersByType(offersAll, type);
+  const offersByTypeAll = getOffersByType(offersAll, type);
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = getEventCreationDate(dayjs(new Date()));
   const eventEndDate = getEventCreationDate(dayjs(new Date()));
@@ -126,11 +127,11 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
         </div>
 
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartDate}" ${isDisabled ? `disabled` : ``}>
+          <label class="visually-hidden" for="event-start-time">From</label>
+          <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="${eventStartDate}" ${isDisabled ? `disabled` : ``}>
           &mdash;
-          <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndDate}" ${isDisabled ? `disabled` : ``}>
+          <label class="visually-hidden" for="event-end-time">To</label>
+          <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="${eventEndDate}" ${isDisabled ? `disabled` : ``}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -182,9 +183,10 @@ export default class EventNew extends SmartView {
   _getDestinationByName(name) {
     return this._destinations.find((item) => item.name === name);
   }
+
   _setData() {
-    const timeStart = dayjs(new Date());
-    const timeEnd = dayjs(new Date());
+    const timeStart = dayjs(new Date()).format();
+    const timeEnd = dayjs(new Date()).format();
 
     this.updateData({
       timeStart,
@@ -199,7 +201,7 @@ export default class EventNew extends SmartView {
 
   reset(point) {
     this.updateData(
-        EventNew._parsePointToData(point)
+        this._parsePointToData(point)
     );
   }
 
@@ -225,7 +227,6 @@ export default class EventNew extends SmartView {
   _setDatepickers() {
     this._removeDatepickers();
     this._datepickerStart = flatpickr(
-
         this.getElement().querySelector(`input[name=event-start-time]`),
         {
           dateFormat: `d/m/Y H:i`,
@@ -242,7 +243,8 @@ export default class EventNew extends SmartView {
           dateFormat: `d/m/Y H:i`,
           defaultDate: this._data.timeEnd,
           enableTime: true,
-          onChange: this._endTimeInputHandler,
+          // onChange: this._endTimeInputHandler,
+          onChange: () => {},
           minDate: this._data.timeStart
         }
     );
@@ -369,7 +371,7 @@ export default class EventNew extends SmartView {
   }
 
   _offersChangeHandler() {
-    const offersByTypeAll = _getOffersByType(this._offers, this._data.type);
+    const offersByTypeAll = getOffersByType(this._offers, this._data.type);
     const offersElem = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
     const offersSelectedInxs = offersElem.filter((offer) => offer.checked).map((item) => item.dataset.value);
     const offers = offersSelectedInxs.map((inx) => offersByTypeAll[inx]);

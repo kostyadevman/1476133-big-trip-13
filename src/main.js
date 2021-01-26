@@ -12,11 +12,12 @@ import TripInfoPresenter from "./presenter/trip-info.js";
 import TripPresenter from "./presenter/trip.js";
 
 import Api from "./api.js";
-import {MenuItem, UpdateType, FilterType} from "./const.js";
+
 import {RenderPosition, render, remove} from "./utils/render.js";
+import {MenuItem, UpdateType, FilterType} from "./const.js";
 
 
-const AUTHORIZATION = `Basic SL3sf3dfKwcl7sa0B`;
+const AUTHORIZATION = `Basic KML3sf3dfKwcl7sa0B`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const api = new Api(END_POINT, AUTHORIZATION);

@@ -86,7 +86,7 @@ export default class Point {
 
   setViewState(state) {
     const resetFormState = () => {
-      this._taskEditComponent.updateData({
+      this._pointEditComponent.updateData({
         isDisabled: false,
         isSaving: false,
         isDeleting: false

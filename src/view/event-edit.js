@@ -1,6 +1,6 @@
 import {BLANK_POINT} from "../const";
 import SmartView from "./smart.js";
-import {_getOffersByType, getEventCreationDate, getIcon} from "../utils/point";
+import {getOffersByType, getEventCreationDate, getIcon} from "../utils/point";
 import flatpickr from "flatpickr";
 
 import "flatpickr/dist/flatpickr.min.css";
@@ -94,7 +94,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
     isDeleting
   } = data;
   const offerTitles = offers.map((item) => item.title) || [];
-  let offersByTypeAll = _getOffersByType(offersAll, type);
+  let offersByTypeAll = getOffersByType(offersAll, type);
 
   const offersSelected = offersByTypeAll.map((item) => {
     if (offerTitles.includes(item.title)) {
@@ -201,10 +201,6 @@ export default class EventEdit extends SmartView {
     this._setDatepickers();
   }
 
-  _getOffersByType(type) {
-    return this._offers.find((item) => item.type === type.toLowerCase()).offers;
-  }
-
   _getDestinationByName(name) {
     return this._destinations.find((item) => item.name === name);
   }
@@ -255,7 +251,7 @@ export default class EventEdit extends SmartView {
           defaultDate: this._data.timeStart,
           enableTime: true,
           onChange: this._startTimeInputHandler,
-          maxDate: this._data.timeEnd
+          maxDate: this._data.timeEnd,
         }
     );
 
@@ -266,7 +262,7 @@ export default class EventEdit extends SmartView {
           defaultDate: this._data.timeEnd,
           enableTime: true,
           onChange: this._endTimeInputHandler,
-          minDate: this._data.timeStart
+          minDate: this._data.timeStart,
         }
     );
   }
@@ -374,7 +370,7 @@ export default class EventEdit extends SmartView {
   }
 
   _offersChangeHandler() {
-    const offersByTypeAll = _getOffersByType(this._offers, this._data.type);
+    const offersByTypeAll = getOffersByType(this._offers, this._data.type);
     const offersElem = Array.from(this.getElement().querySelectorAll(`.event__offer-checkbox`));
     const offersSelectedInxs = offersElem.filter((offer) => offer.checked).map((item) => item.dataset.value);
     const offers = offersSelectedInxs.map((inx) => offersByTypeAll[inx]);

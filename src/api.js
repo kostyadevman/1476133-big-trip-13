@@ -1,6 +1,3 @@
-
-// import OffersModel from "./model/offers.js";
-// import DestinationModel from "./model/destinations.js";
 import {adaptToClient, adaptToServer} from "./utils/point.js";
 
 const Method = {
@@ -33,14 +30,10 @@ export default class Api {
 
   getAllData() {
     const pOffers = this._getOffers();
-    // .then((offers) => OffersModel.setOffers(offers));
     const pDestination = this._getDestinations();
-    // .then((destinations) => DestinationModel.setDestinations(destinations));
     const pPoinsts = this._getPoints();
 
-    const promise = Promise.all([pOffers, pDestination, pPoinsts]);
-
-    return promise;
+    return Promise.all([pOffers, pDestination, pPoinsts]);
   }
 
   _getPoints() {

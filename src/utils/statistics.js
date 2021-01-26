@@ -5,8 +5,6 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 dayjs.extend(isBetween);
 
-// dayjs.extend(duration);
-
 export const makeItemsUniq = (items) => [...new Set(items)];
 
 export const countPointsByType = (points, type) => {

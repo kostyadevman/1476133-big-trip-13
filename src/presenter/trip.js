@@ -205,7 +205,6 @@ export default class Trip {
 
     this._pointPresenter = {};
 
-    // remove(this._addEventComponent);
     remove(this._sortComponent);
     remove(this._noTripPointComponent);
     remove(this._tripPointListComponent);
