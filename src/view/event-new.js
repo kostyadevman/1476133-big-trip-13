@@ -83,12 +83,12 @@ const eventDestinationTemplate = (destination, photos, description) => {
 };
 
 const createEventEditTemplate = (data, offersAll, destinations) => {
-  const {destination, photos, description, type, price, isDisabled, isSaving} = data;
+  const {destination, photos, description, type, price, timeStart, timeEnd, isDisabled, isSaving} = data;
 
   const offersByTypeAll = getOffersByType(offersAll, type);
   const eventDestination = eventDestinationTemplate(destination, photos, description);
-  const eventStartDate = getEventCreationDate(dayjs(new Date()));
-  const eventEndDate = getEventCreationDate(dayjs(new Date()));
+  const eventStartDate = getEventCreationDate(dayjs(timeStart));
+  const eventEndDate = getEventCreationDate(dayjs(timeEnd));
   const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), type, isDisabled);
   const options = eventOptionListTemplate(destinations);
   const offerList = eventOfferListTemplate(offersByTypeAll, isDisabled);
@@ -254,7 +254,7 @@ export default class EventNew extends SmartView {
           enableTime: true,
           onChange: this._startTimeInputHandler,
           minDate: `today`,
-          maxDate: this._data.timeEnd,
+          maxDate: `today`,
         }
     );
 
@@ -265,7 +265,7 @@ export default class EventNew extends SmartView {
           defaultDate: this._data.timeEnd,
           enableTime: true,
           onChange: this._endTimeInputHandler,
-          minDate: this._data.timeStart,
+          minDate: `today`,
         }
     );
   }
@@ -282,14 +282,6 @@ export default class EventNew extends SmartView {
     this.getElement()
       .querySelector(`.event__input--price`)
       .addEventListener(`input`, this._priceInputHandler);
-
-    this.getElement()
-      .querySelector(`input[name=event-start-time]`)
-      .addEventListener(`input`, this._startTimeInputHandler);
-
-    this.getElement()
-      .querySelector(`input[name=event-end-time]`)
-      .addEventListener(`input`, this._endTimeInputHandler);
 
     const offersElement = this.getElement().querySelector(`.event__available-offers`);
     if (offersElement !== null) {
