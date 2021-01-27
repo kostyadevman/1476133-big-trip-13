@@ -18,28 +18,12 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  _getOffers() {
-    return this._load({url: `offers`})
-      .then(Api.toJSON);
-  }
-
-  _getDestinations() {
-    return this._load({url: `destinations`})
-      .then(Api.toJSON);
-  }
-
   getAllData() {
     const pOffers = this._getOffers();
     const pDestination = this._getDestinations();
     const pPoinsts = this._getPoints();
 
     return Promise.all([pOffers, pDestination, pPoinsts]);
-  }
-
-  _getPoints() {
-    return this._load({url: `points`})
-      .then(Api.toJSON)
-      .then((points) => points.map(adaptToClient));
   }
 
   updatePoint(point) {
@@ -68,6 +52,22 @@ export default class Api {
       url: `points/${point.id}`,
       method: Method.DELETE
     });
+  }
+
+  _getOffers() {
+    return this._load({url: `offers`})
+      .then(Api.toJSON);
+  }
+
+  _getDestinations() {
+    return this._load({url: `destinations`})
+      .then(Api.toJSON);
+  }
+
+  _getPoints() {
+    return this._load({url: `points`})
+      .then(Api.toJSON)
+      .then((points) => points.map(adaptToClient));
   }
 
   _load({

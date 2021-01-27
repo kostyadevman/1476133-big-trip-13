@@ -9,7 +9,7 @@ import "flatpickr/dist/flatpickr.min.css";
 import {BLANK_POINT} from "../const.js";
 
 
-const eventTypeListTemplate = (types, isDisabled) => {
+const eventTypeListTemplate = (types, typeSelected, isDisabled) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
@@ -21,6 +21,7 @@ const eventTypeListTemplate = (types, isDisabled) => {
             type="radio" name="event-type"
             value="${type.toLowerCase()}"
             ${isDisabled ? `disabled` : ``}
+            ${type === typeSelected ? `checked` : ``}
         >
         <label
             class="event__type-label  event__type-label--${type.toLowerCase()}"
@@ -88,7 +89,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = getEventCreationDate(dayjs(new Date()));
   const eventEndDate = getEventCreationDate(dayjs(new Date()));
-  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), isDisabled);
+  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), type, isDisabled);
   const options = eventOptionListTemplate(destinations);
   const offerList = eventOfferListTemplate(offersByTypeAll, isDisabled);
   const icon = getIcon(type);
@@ -180,20 +181,6 @@ export default class EventNew extends SmartView {
     this._setDatepickers();
   }
 
-  _getDestinationByName(name) {
-    return this._destinations.find((item) => item.name === name);
-  }
-
-  _setData() {
-    const timeStart = dayjs(new Date()).format();
-    const timeEnd = dayjs(new Date()).format();
-
-    this.updateData({
-      timeStart,
-      timeEnd
-    }, true);
-  }
-
   removeElement() {
     super.removeElement();
     this._removeDatepickers();
@@ -211,6 +198,39 @@ export default class EventNew extends SmartView {
         this._offers,
         this._destinations.map((destination) => destination.name)
     );
+  }
+
+  setFormSubmitHandler(callback) {
+    this._validateDestination();
+    this._validatePrice();
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setCancelClickHandler(callback) {
+    this._callback.cancelClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._cancelClickHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setDatepickers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCancelClickHandler(this._callback.cancelClick);
+  }
+
+  _getDestinationByName(name) {
+    return this._destinations.find((item) => item.name === name);
+  }
+
+  _setData() {
+    const timeStart = dayjs(new Date());
+    const timeEnd = dayjs(new Date());
+
+    this.updateData({
+      timeStart,
+      timeEnd
+    }, true);
   }
 
   _removeDatepickers() {
@@ -233,7 +253,8 @@ export default class EventNew extends SmartView {
           defaultDate: this._data.timeStart,
           enableTime: true,
           onChange: this._startTimeInputHandler,
-          maxDate: this._data.timeEnd
+          minDate: `today`,
+          maxDate: this._data.timeEnd,
         }
     );
 
@@ -243,19 +264,10 @@ export default class EventNew extends SmartView {
           dateFormat: `d/m/Y H:i`,
           defaultDate: this._data.timeEnd,
           enableTime: true,
-          // onChange: this._endTimeInputHandler,
-          onChange: () => {},
-          minDate: this._data.timeStart
+          onChange: this._endTimeInputHandler,
+          minDate: this._data.timeStart,
         }
     );
-  }
-
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this._setDatepickers();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCancelClickHandler(this._callback.cancelClick);
   }
 
   _setInnerHandlers() {
@@ -390,18 +402,6 @@ export default class EventNew extends SmartView {
     evt.preventDefault();
     this._removeDatepickers();
     this._callback.formSubmit(this._parseDataToPoint(this._data));
-  }
-
-  setFormSubmitHandler(callback) {
-    this._validateDestination();
-    this._validatePrice();
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  setCancelClickHandler(callback) {
-    this._callback.cancelClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._cancelClickHandler);
   }
 
   _parsePointToData(point) {

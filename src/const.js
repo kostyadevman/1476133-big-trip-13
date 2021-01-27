@@ -1,3 +1,8 @@
+export const EventKey = {
+  KEY_ESCAPE: `Escape`,
+  KEY_ESC: `Esc`
+};
+
 export const FilterType = {
   EVERYTHING: `Everything`,
   FUTURE: `Future`,
@@ -13,7 +18,7 @@ export const SortType = {
 };
 
 export const BLANK_POINT = {
-  type: `Taxi`,
+  type: `taxi`,
   timeStart: null,
   timeEnd: null,
   price: 0,

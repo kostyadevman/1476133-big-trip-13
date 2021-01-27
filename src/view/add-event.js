@@ -14,12 +14,12 @@ export default class AddNewEvent extends AbstractView {
     return createAddNewEventTemplate();
   }
 
-  _addNewEventHandler() {
-    this._callback.addNewEvent();
-  }
-
   setAddClickHandler(callback) {
     this._callback.addNewEvent = callback;
     this.getElement().addEventListener(`click`, this._addNewEventHandler);
+  }
+
+  _addNewEventHandler() {
+    this._callback.addNewEvent();
   }
 }

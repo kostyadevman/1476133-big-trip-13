@@ -1,6 +1,6 @@
 import EventNewView from "../view/event-new.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
+import {UserAction, UpdateType, EventKey} from "../const.js";
 
 export default class PointNew {
   constructor(tripPointListContainer, offersModel, destinationsModel, changeData) {
@@ -83,7 +83,7 @@ export default class PointNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EventKey.KEY_ESCAPE || evt.key === EventKey.KEY_ESC) {
       evt.preventDefault();
       this.destroy();
     }

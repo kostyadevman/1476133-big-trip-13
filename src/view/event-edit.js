@@ -6,7 +6,7 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
 
-const eventTypeListTemplate = (types, isDisabled) => {
+const eventTypeListTemplate = (types, typeSelected, isDisabled) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
@@ -18,6 +18,7 @@ const eventTypeListTemplate = (types, isDisabled) => {
             type="radio" name="event-type"
             value="${type.toLowerCase()}"
             ${isDisabled ? `disabled` : ``}
+            ${type === typeSelected ? `checked` : ``}
         >
         <label
             class="event__type-label  event__type-label--${type.toLowerCase()}"
@@ -105,7 +106,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
   const eventDestination = eventDestinationTemplate(destination, photos, description);
   const eventStartDate = timeStart !== null ? getEventCreationDate(timeStart) : ``;
   const eventEndDate = timeEnd !== null ? getEventCreationDate(timeEnd) : ``;
-  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), isDisabled);
+  const typeList = eventTypeListTemplate(offersAll.map((offer) => offer.type), type, isDisabled);
   const options = eventOptionListTemplate(destinations);
   const offerList = eventOfferListTemplate(offersSelected, isDisabled);
   const icon = getIcon(type);
@@ -161,7 +162,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
             ${isSaving ? `Saving` : `Save`}
         </button>
-        <button class="event__reset-btn" type="reset">
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
             ${isDeleting ? `Deleting...` : `Delete`}
         </button>
         <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
@@ -201,9 +202,6 @@ export default class EventEdit extends SmartView {
     this._setDatepickers();
   }
 
-  _getDestinationByName(name) {
-    return this._destinations.find((item) => item.name === name);
-  }
   removeElement() {
     super.removeElement();
     this._removeDatepickers();
@@ -231,6 +229,26 @@ export default class EventEdit extends SmartView {
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
+  setFormSubmitHandler(callback) {
+    this._validateDestination();
+    this._validatePrice();
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+  }
+  _getDestinationByName(name) {
+    return this._destinations.find((item) => item.name === name);
+  }
+
   _removeDatepickers() {
     if (this._datepickerStart) {
       this._datepickerStart.destroy();
@@ -251,6 +269,7 @@ export default class EventEdit extends SmartView {
           defaultDate: this._data.timeStart,
           enableTime: true,
           onChange: this._startTimeInputHandler,
+          minDate: `today`,
           maxDate: this._data.timeEnd,
         }
     );
@@ -390,26 +409,9 @@ export default class EventEdit extends SmartView {
     this._callback.formSubmit(this._parseDataToPoint(this._data));
   }
 
-  setFormSubmitHandler(callback) {
-    this._validateDestination();
-    this._validatePrice();
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
-  }
-
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(this._parseDataToPoint(this._data));
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
-  }
-
-  setCloseClickHandler(callback) {
-    this._callback.closeClick = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
   _parsePointToData(point) {

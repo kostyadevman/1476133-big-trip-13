@@ -44,6 +44,26 @@ export default class Trip {
     this._renderTripEvents();
   }
 
+  createNewPoint(callback) {
+    if (this._noTripPointComponent !== null) {
+      remove(this._noTripPointComponent);
+    }
+
+    if (this._tripPointListComponent === null) {
+      this._renderPointList();
+    }
+
+    this._pointNewPresenter = new PointNewPresenter(this._tripPointListComponent, this._offersModel, this._destinationsModel, this._handleViewAction);
+    this._pointNewPresenter.init(callback);
+  }
+
+  destroy() {
+    this._clearTripEvents({resetSortType: true});
+
+    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
   _getPoints() {
     const filterType = this._filterModel.getFilter();
     const points = this._pointsModel.getPoints();
@@ -138,19 +158,6 @@ export default class Trip {
     }
   }
 
-  createNewPoint(callback) {
-    if (this._noTripPointComponent !== null) {
-      remove(this._noTripPointComponent);
-    }
-
-    if (this._tripPointListComponent === null) {
-      this._renderPointList();
-    }
-
-    this._pointNewPresenter = new PointNewPresenter(this._tripPointListComponent, this._offersModel, this._destinationsModel, this._handleViewAction);
-    this._pointNewPresenter.init(callback);
-  }
-
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -234,13 +241,6 @@ export default class Trip {
     this._renderPoints();
     this._renderSort();
 
-  }
-
-  destroy() {
-    this._clearTripEvents({resetSortType: true});
-
-    this._pointsModel.removeObserver(this._handleModelEvent);
-    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
 }

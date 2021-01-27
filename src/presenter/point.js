@@ -1,7 +1,7 @@
 import TripPointView from "../view/trip-point.js";
 import EventEditView from "../view/event-edit.js";
 import {render, RenderPosition, replace, remove} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
+import {UserAction, UpdateType, EventKey} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -127,7 +127,7 @@ export default class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === EventKey.KEY_ESCAPE || evt.key === EventKey.KEY_ESC) {
       evt.preventDefault();
       this._pointEditComponent.reset(this._point);
       this._replaceFormToPoint();
@@ -173,6 +173,5 @@ export default class Point {
         UpdateType.MINOR,
         point
     );
-    this._replaceFormToPoint();
   }
 }
