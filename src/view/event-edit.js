@@ -95,7 +95,7 @@ const createEventEditTemplate = (data, offersAll, destinations) => {
     isDeleting
   } = data;
   const offerTitles = offers.map((item) => item.title) || [];
-  let offersByTypeAll = getOffersByType(offersAll, type);
+  const offersByTypeAll = getOffersByType(offersAll, type);
 
   const offersSelected = offersByTypeAll.map((item) => {
     if (offerTitles.includes(item.title)) {
@@ -415,7 +415,7 @@ export default class EventEdit extends SmartView {
   }
 
   _parsePointToData(point) {
-    let data = Object.assign({}, point);
+    const data = Object.assign({}, point);
     data.offers = point.offers.slice();
     return data;
   }

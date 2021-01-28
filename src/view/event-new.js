@@ -397,7 +397,7 @@ export default class EventNew extends SmartView {
   }
 
   _parsePointToData(point) {
-    let data = Object.assign({}, point);
+    const data = Object.assign({}, point);
     data.offers = point.offers.slice();
     return data;
   }
